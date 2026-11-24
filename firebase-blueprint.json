@@ -1,0 +1,350 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Authenticated Khidmati user account with role and profile metadata.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "phone": { "type": "string", "minLength": 10, "maxLength": 20 },
+        "phoneVerified": { "type": "boolean" },
+        "phoneVerifiedAt": { "type": "string", "maxLength": 64 },
+        "photoUrl": { "type": "string", "maxLength": 200000 },
+        "authProviders": { "type": "array" },
+        "role": { "type": "string", "enum": ["customer", "provider", "admin"] },
+        "city": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "neighborhood": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "savedAddresses": { "type": "array" },
+        "notificationPreferences": { "type": "object" },
+        "isSuspended": { "type": "boolean" },
+        "lastLoginAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "email", "role", "isSuspended", "createdAt", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator membership document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "grantedAt"]
+    },
+    "PlatformSettings": {
+      "title": "PlatformSettings",
+      "description": "Configurable platform commission rate and operational parameters.",
+      "type": "object",
+      "properties": {
+        "commissionRatePercent": { "type": "number" },
+        "weeklyCycleDays": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["commissionRatePercent", "weeklyCycleDays", "updatedAt", "updatedBy"]
+    },
+    "ServiceCategory": {
+      "title": "ServiceCategory",
+      "description": "Arabic service category definition.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "slug": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "nameAr": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "descriptionAr": { "type": "string", "minLength": 5, "maxLength": 400 },
+        "examplesAr": { "type": "array" },
+        "icon": { "type": "string", "enum": ["zap", "droplets", "hammer", "wind", "sparkles", "paintbrush", "wrench", "tv"] },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["id", "slug", "nameAr", "descriptionAr", "icon", "isActive"]
+    },
+    "ServiceProvider": {
+      "title": "ServiceProvider",
+      "description": "Publicly queryable service provider profile (PII documents isolated separately).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "uid": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "fullName": { "type": "string", "minLength": 3, "maxLength": 100 },
+        "phone": { "type": "string", "minLength": 10, "maxLength": 20 },
+        "whatsapp": { "type": "string", "maxLength": 20 },
+        "categoryId": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "city": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "neighborhood": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "serviceAreas": { "type": "array" },
+        "yearsExperience": { "type": "number" },
+        "description": { "type": "string", "minLength": 20, "maxLength": 1500 },
+        "profileImage": { "type": "string", "maxLength": 200000 },
+        "approvalStatus": { "type": "string", "enum": ["pending", "approved", "rejected", "suspended"] },
+        "verificationStatus": { "type": "string", "enum": ["verified", "unverified"] },
+        "verifiedAt": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "isDemo": { "type": "boolean" }
+      },
+      "required": ["id", "uid", "fullName", "phone", "categoryId", "city", "neighborhood", "serviceAreas", "yearsExperience", "description", "approvalStatus", "verificationStatus", "createdAt", "updatedAt", "isDemo"]
+    },
+    "ProviderDocument": {
+      "title": "ProviderDocument",
+      "description": "Private verification documents for a provider, restricted to owner and admins.",
+      "type": "object",
+      "properties": {
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "uid": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "documents": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["providerId", "uid", "documents", "updatedAt"]
+    },
+    "ServiceRequest": {
+      "title": "ServiceRequest",
+      "description": "Customer service request tracked across its full lifecycle.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "customerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "customerPhone": { "type": "string", "minLength": 10, "maxLength": 20 },
+        "categoryId": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "categoryName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "problemDescription": { "type": "string", "minLength": 10, "maxLength": 1500 },
+        "city": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "neighborhood": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "preferredTime": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Assigned", "In Progress", "Completed", "Cancelled", "Disputed"] },
+        "assignedProviderId": { "type": "string", "maxLength": 128 },
+        "assignedProviderName": { "type": "string", "maxLength": 100 },
+        "providerDecision": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "agreedPrice": { "type": "number" },
+        "disputeReason": { "type": "string", "maxLength": 600 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerId", "customerName", "customerPhone", "categoryId", "categoryName", "problemDescription", "city", "neighborhood", "preferredTime", "status", "createdAt", "updatedAt"]
+    },
+    "CustomerReview": {
+      "title": "CustomerReview",
+      "description": "Moderated customer review linked to a service provider.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "customerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "neighborhood": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "minLength": 10, "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "isDemo": { "type": "boolean" }
+      },
+      "required": ["id", "providerId", "customerId", "customerName", "neighborhood", "rating", "comment", "status", "createdAt", "isDemo"]
+    },
+    "Commission": {
+      "title": "Commission",
+      "description": "Server-calculated commission ledger record for a completed service request.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "requestId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "agreedPrice": { "type": "number" },
+        "commissionRatePercent": { "type": "number" },
+        "commissionAmount": { "type": "number" },
+        "providerNetAmount": { "type": "number" },
+        "statementId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "weekKey": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "status": { "type": "string", "enum": ["unpaid", "paid", "overdue"] },
+        "serverSignature": { "type": "string", "minLength": 16, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "requestId", "providerId", "providerName", "agreedPrice", "commissionRatePercent", "commissionAmount", "providerNetAmount", "statementId", "weekKey", "status", "serverSignature", "createdAt"]
+    },
+    "WeeklyStatement": {
+      "title": "WeeklyStatement",
+      "description": "Weekly aggregated commission statement per provider.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "weekKey": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "periodStart": { "type": "string", "maxLength": 40 },
+        "periodEnd": { "type": "string", "maxLength": 40 },
+        "totalJobs": { "type": "number" },
+        "totalGrossAmount": { "type": "number" },
+        "totalCommissionAmount": { "type": "number" },
+        "totalNetAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["open", "due", "paid", "overdue"] },
+        "paymentMethod": { "type": "string", "maxLength": 80 },
+        "transactionReference": { "type": "string", "maxLength": 120 },
+        "paidAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "providerId", "providerName", "weekKey", "periodStart", "periodEnd", "totalJobs", "totalGrossAmount", "totalCommissionAmount", "totalNetAmount", "status", "updatedAt"]
+    },
+    "PaymentRecord": {
+      "title": "PaymentRecord",
+      "description": "Payment verification and gateway integration record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "statementId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "providerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "enum": ["IQD"] },
+        "gateway": { "type": "string", "enum": ["manual_cash", "manual_transfer", "zaincash_future"] },
+        "status": { "type": "string", "enum": ["pending", "initiated", "confirmed", "failed", "refunded"] },
+        "paymentReference": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "gatewayTransactionId": { "type": "string", "maxLength": 120 },
+        "confirmedByAdminUid": { "type": "string", "maxLength": 128 },
+        "refundReason": { "type": "string", "maxLength": 400 },
+        "serverVerificationHash": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "statementId", "providerId", "providerName", "amount", "currency", "gateway", "status", "paymentReference", "createdAt", "updatedAt"]
+    },
+    "NotificationItem": {
+      "title": "NotificationItem",
+      "description": "In-app notification item with future email queue flag.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "recipientRole": { "type": "string", "enum": ["admin", "provider", "customer"] },
+        "recipientUid": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "type": { "type": "string", "enum": ["new_provider", "new_request", "job_completed", "commission_overdue", "new_complaint", "assignment", "payment_confirmed"] },
+        "titleAr": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "messageAr": { "type": "string", "minLength": 2, "maxLength": 500 },
+        "relatedId": { "type": "string", "maxLength": 128 },
+        "isRead": { "type": "boolean" },
+        "emailQueued": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "recipientRole", "recipientUid", "type", "titleAr", "messageAr", "isRead", "emailQueued", "createdAt"]
+    },
+    "Complaint": {
+      "title": "Complaint",
+      "description": "Customer complaint or dispute submission.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "requestId": { "type": "string", "maxLength": 128 },
+        "providerId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "reporterUid": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "reporterName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "reporterPhone": { "type": "string", "minLength": 10, "maxLength": 20 },
+        "reason": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "details": { "type": "string", "minLength": 10, "maxLength": 1200 },
+        "status": { "type": "string", "enum": ["open", "investigating", "resolved"] },
+        "adminResolutionNote": { "type": "string", "maxLength": 600 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "providerId", "reporterUid", "reporterName", "reporterPhone", "reason", "details", "status", "createdAt", "updatedAt"]
+    },
+    "CustomerAdminMeta": {
+      "title": "CustomerAdminMeta",
+      "description": "Internal admin-only notes and suspicious-account flags for customer management.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "adminNotes": { "type": "string", "maxLength": 2000 },
+        "flaggedSuspicious": { "type": "boolean" },
+        "flagReason": { "type": "string", "maxLength": 400 },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["uid", "flaggedSuspicious", "updatedAt", "updatedBy"]
+    },
+    "AccountDeletionRequest": {
+      "title": "AccountDeletionRequest",
+      "description": "Customer account deletion request and audit trail reviewed by administrators.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "customerEmail": { "type": "string", "maxLength": 160 },
+        "customerPhone": { "type": "string", "maxLength": 20 },
+        "reason": { "type": "string", "maxLength": 600 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "completed"] },
+        "adminNote": { "type": "string", "maxLength": 600 },
+        "reviewedBy": { "type": "string", "maxLength": 128 },
+        "completedAt": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "customerName", "customerEmail", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and RBAC role assignments (owner or admin read only)."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Admin membership records."
+    },
+    "/platformSettings/{settingId}": {
+      "schema": { "$ref": "#/entities/PlatformSettings" },
+      "description": "Configurable commission rate and billing cycle settings."
+    },
+    "/serviceCategories/{categoryId}": {
+      "schema": { "$ref": "#/entities/ServiceCategory" },
+      "description": "Publicly readable service categories managed by administrators."
+    },
+    "/providers/{providerId}": {
+      "schema": { "$ref": "#/entities/ServiceProvider" },
+      "description": "Service provider marketplace profiles."
+    },
+    "/providerDocuments/{providerId}": {
+      "schema": { "$ref": "#/entities/ProviderDocument" },
+      "description": "Private verification documents restricted to provider owner and admins."
+    },
+    "/serviceRequests/{requestId}": {
+      "schema": { "$ref": "#/entities/ServiceRequest" },
+      "description": "Customer service requests and job progress."
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/CustomerReview" },
+      "description": "Moderated customer reviews."
+    },
+    "/commissions/{commissionId}": {
+      "schema": { "$ref": "#/entities/Commission" },
+      "description": "Deterministic per-job commission ledger entries."
+    },
+    "/weeklyStatements/{statementId}": {
+      "schema": { "$ref": "#/entities/WeeklyStatement" },
+      "description": "Weekly commission statement balances per provider."
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/PaymentRecord" },
+      "description": "Commission payment and future ZainCash verification records."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/NotificationItem" },
+      "description": "In-app notification center events."
+    },
+    "/complaints/{complaintId}": {
+      "schema": { "$ref": "#/entities/Complaint" },
+      "description": "Customer complaints and dispute tickets."
+    },
+    "/customerAdminMeta/{userId}": {
+      "schema": { "$ref": "#/entities/CustomerAdminMeta" },
+      "description": "Admin-only internal customer notes and risk flags."
+    },
+    "/accountDeletionRequests/{requestId}": {
+      "schema": { "$ref": "#/entities/AccountDeletionRequest" },
+      "description": "Customer account deletion requests and audit log."
+    }
+  }
+}

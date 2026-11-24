@@ -1,0 +1,6 @@
+{
+  "name": "خدمتي | KHIDMATI",
+  "description": "منصة خدمتي للخدمات المنزلية والمهنية الموثوقة في أربيل والعراق — كهرباء، سباكة، تكييف، نجارة، تنظيف وصيانة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
